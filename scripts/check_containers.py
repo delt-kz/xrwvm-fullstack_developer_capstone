@@ -11,7 +11,7 @@ for attempt in range(60):
             dealers = json.load(response)
         if dealers['status'] == 200 and len(dealers['dealers']) == 50:
             break
-    except (urllib.error.URLError, TimeoutError):
+    except OSError:
         pass
     time.sleep(5)
 else:
