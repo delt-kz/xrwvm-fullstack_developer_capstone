@@ -49,7 +49,7 @@ jobs:
           docker tag $(docker compose images -q web) dealership:latest
           docker tag $(docker compose images -q api) dealership-api:latest
           docker tag $(docker compose images -q sentiment) dealership-sentiment:latest
-          kind load docker-image dealership:latest dealership-api:latest dealership-sentiment:latest mongo:7 --name dealership-lab
+          kind load docker-image dealership:latest dealership-api:latest dealership-sentiment:latest --name dealership-lab
           kubectl apply -f deployment.yml
           kubectl rollout status deployment/dealership --timeout=180s
           kubectl port-forward service/dealership 8001:8000 > /tmp/dealership-forward.log 2>&1 &
