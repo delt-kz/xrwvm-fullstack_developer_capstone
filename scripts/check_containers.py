@@ -1,10 +1,11 @@
 """Check actual services running in the CI runner's local Docker network."""
 import json
+import os
 import time
 import urllib.error
 import urllib.request
 
-BASE = 'http://127.0.0.1:8000'
+BASE = os.getenv('TEST_BASE_URL', 'http://127.0.0.1:8000')
 for attempt in range(60):
     try:
         with urllib.request.urlopen(BASE + '/djangoapp/get_dealers', timeout=10) as response:

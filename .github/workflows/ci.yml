@@ -40,6 +40,23 @@ jobs:
         run: docker compose up -d --build
       - name: Verify container endpoints
         run: python scripts/check_containers.py
+      - name: Create classroom Kubernetes cluster
+        uses: helm/kind-action@v1
+        with:
+          cluster_name: dealership-lab
+      - name: Load and deploy application images
+        run: |
+          docker tag $(docker compose images -q web) dealership:latest
+          docker tag $(docker compose images -q api) dealership-api:latest
+          docker tag $(docker compose images -q sentiment) dealership-sentiment:latest
+          kind load docker-image dealership:latest dealership-api:latest dealership-sentiment:latest mongo:7 --name dealership-lab
+          kubectl apply -f deployment.yml
+          kubectl rollout status deployment/dealership --timeout=180s
+          kubectl port-forward service/dealership 8001:8000 > /tmp/dealership-forward.log 2>&1 &
+      - name: Test Kubernetes deployment
+        env:
+          TEST_BASE_URL: http://127.0.0.1:8001
+        run: python scripts/check_containers.py
       - name: Show running containers and logs
         if: always()
         run: |

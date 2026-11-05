@@ -13,17 +13,20 @@ spec:
       containers:
         - name: web
           image: dealership:latest
+          imagePullPolicy: Never
           ports: [{containerPort: 8000}]
           env:
             - {name: backend_url, value: 'http://127.0.0.1:3030'}
             - {name: sentiment_analyzer_url, value: 'http://127.0.0.1:5050'}
         - name: mongo-api
           image: dealership-api:latest
+          imagePullPolicy: Never
           ports: [{containerPort: 3030}]
           env:
             - {name: MONGODB_URI, value: 'mongodb://127.0.0.1:27017/dealershipsDB'}
         - name: sentiment
           image: dealership-sentiment:latest
+          imagePullPolicy: Never
           ports: [{containerPort: 5050}]
         - name: database
           image: mongo:7
