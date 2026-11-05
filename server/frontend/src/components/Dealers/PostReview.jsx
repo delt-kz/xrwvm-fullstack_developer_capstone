@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import "./Dealers.css";
 import "../assets/style.css";
@@ -32,7 +32,7 @@ const PostReview = () => {
       return;
     }
 
-    let model_split = model.split(" ");
+    let model_split = model.split("|");
     let make_chosen = model_split[0];
     let model_chosen = model_split[1];
 
@@ -62,7 +62,7 @@ const PostReview = () => {
   }
 
   }
-  const get_dealer = async ()=>{
+  const get_dealer = useCallback(async ()=>{
     const res = await fetch(dealer_url, {
       method: "GET"
     });
@@ -73,9 +73,9 @@ const PostReview = () => {
       if(dealerobjs.length > 0)
         setDealer(dealerobjs[0])
     }
-  }
+  },[dealer_url]);
 
-  const get_cars = async ()=>{
+  const get_cars = useCallback(async ()=>{
     const res = await fetch(carmodels_url, {
       method: "GET"
     });
@@ -83,11 +83,11 @@ const PostReview = () => {
     
     let carmodelsarr = Array.from(retobj.CarModels)
     setCarmodels(carmodelsarr)
-  }
+  },[carmodels_url]);
   useEffect(() => {
     get_dealer();
     get_cars();
-  },[]);
+  },[get_dealer,get_cars]);
 
 
   return (
@@ -95,22 +95,22 @@ const PostReview = () => {
       <Header/>
       <div  style={{margin:"5%"}}>
       <h1 style={{color:"darkblue"}}>{dealer.full_name}</h1>
-      <textarea id='review' cols='50' rows='7' onChange={(e) => setReview(e.target.value)}></textarea>
+      <textarea aria-label="Review" id='review' cols='50' rows='7' onChange={(e) => setReview(e.target.value)}></textarea>
       <div className='input_field'>
-      Purchase Date <input type="date" onChange={(e) => setDate(e.target.value)}/>
+      Purchase Date <input aria-label="Purchase Date" type="date" onChange={(e) => setDate(e.target.value)}/>
       </div>
       <div className='input_field'>
       Car Make 
-      <select name="cars" id="cars" onChange={(e) => setModel(e.target.value)}>
-      <option value="" selected disabled hidden>Choose Car Make and Model</option>
+      <select aria-label="Car Make and Model" defaultValue="" name="cars" id="cars" onChange={(e) => setModel(e.target.value)}>
+      <option value="" disabled hidden>Choose Car Make and Model</option>
       {carmodels.map(carmodel => (
-          <option value={carmodel.CarMake+" "+carmodel.CarModel}>{carmodel.CarMake} {carmodel.CarModel}</option>
+          <option key={carmodel.id} value={carmodel.CarMake+"|"+carmodel.CarModel}>{carmodel.CarMake} {carmodel.CarModel}</option>
       ))}
       </select>        
       </div >
 
       <div className='input_field'>
-      Car Year <input type="int" onChange={(e) => setYear(e.target.value)} max={2023} min={2015}/>
+      Car Year <input aria-label="Car Year" type="number" onChange={(e) => setYear(e.target.value)} max={2023} min={2015}/>
       </div>
 
       <div>

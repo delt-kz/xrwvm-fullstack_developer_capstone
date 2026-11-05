@@ -28,7 +28,7 @@ SECRET_KEY =\
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS','localhost,127.0.0.1,.labs.cognitiveclass.ai,.cloud.ibm.com,.codeengine.appdomain.cloud').split(',')
 CSRF_TRUSTED_ORIGINS = []
 
 REST_FRAMEWORK = {
@@ -135,4 +135,6 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'static']
+if (BASE_DIR / 'frontend' / 'build' / 'static').exists():
+    STATICFILES_DIRS.append(BASE_DIR / 'frontend' / 'build' / 'static')
 

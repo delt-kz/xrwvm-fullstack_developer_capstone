@@ -1,0 +1,21 @@
+services:
+  mongo_db:
+    image: mongo:7
+    volumes: [mongo_data:/data/db]
+  api:
+    build: server/database
+    ports: ["127.0.0.1:3030:3030"]
+    depends_on: [mongo_db]
+    restart: on-failure
+  sentiment:
+    build: server/djangoapp/microservices
+    ports: ["127.0.0.1:5050:5050"]
+  web:
+    build: server
+    ports: ["127.0.0.1:8000:8000"]
+    environment:
+      backend_url: http://api:3030
+      sentiment_analyzer_url: http://sentiment:5050
+    depends_on: [api,sentiment]
+volumes:
+  mongo_data:

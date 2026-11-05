@@ -1,0 +1,33 @@
+name: Dealership CI
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Python dependencies
+        run: pip install -r server/requirements.txt
+      - name: Django system and migration checks
+        run: |
+          python server/manage.py check
+          python server/manage.py makemigrations --check --dry-run
+      - name: Django API tests
+        run: python server/manage.py test djangoapp
+      - name: Validate Node API syntax
+        run: node --check server/database/app.js
+      - name: Install frontend dependencies
+        working-directory: server/frontend
+        run: npm ci --no-audit --no-fund
+      - name: Lint and build React
+        working-directory: server/frontend
+        env:
+          CI: 'true'
+        run: npm run build

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import "./Dealers.css";
 import "../assets/style.css";
 import Header from '../Header/Header';
@@ -26,7 +26,7 @@ const Dealers = () => {
     }
   }
 
-  const get_dealers = async ()=>{
+  const get_dealers = useCallback(async ()=>{
     const res = await fetch(dealer_url, {
       method: "GET"
     });
@@ -41,10 +41,8 @@ const Dealers = () => {
       setStates(Array.from(new Set(states)))
       setDealersList(all_dealers)
     }
-  }
-  useEffect(() => {
-    get_dealers();
-  },[]);  
+  },[dealer_url]);
+  useEffect(() => { get_dealers(); },[get_dealers]);  
 
 
 let isLoggedIn = sessionStorage.getItem("username") != null ? true : false;
@@ -52,7 +50,7 @@ return(
   <div>
       <Header/>
 
-     <table className='table'>
+     <table className='table'><tbody>
       <tr>
       <th>ID</th>
       <th>Dealer Name</th>
@@ -60,11 +58,11 @@ return(
       <th>Address</th>
       <th>Zip</th>
       <th>
-      <select name="state" id="state" onChange={(e) => filterDealers(e.target.value)}>
-      <option value="" selected disabled hidden>State</option>
+      <select aria-label="State" defaultValue="" name="state" id="state" onChange={(e) => filterDealers(e.target.value)}>
+      <option value="" disabled hidden>State</option>
       <option value="All">All States</option>
       {states.map(state => (
-          <option value={state}>{state}</option>
+          <option key={state} value={state}>{state}</option>
       ))}
       </select>        
 
@@ -75,7 +73,7 @@ return(
       }
       </tr>
      {dealersList.map(dealer => (
-        <tr>
+        <tr key={dealer.id}>
           <td>{dealer['id']}</td>
           <td><a href={'/dealer/'+dealer['id']}>{dealer['full_name']}</a></td>
           <td>{dealer['city']}</td>
@@ -88,7 +86,7 @@ return(
           }
         </tr>
       ))}
-     </table>;
+     </tbody></table>
   </div>
 )
 }
