@@ -31,3 +31,17 @@ jobs:
         env:
           CI: 'true'
         run: npm run build
+
+  containers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and start the classroom container stack
+        run: docker compose up -d --build
+      - name: Verify container endpoints
+        run: python scripts/check_containers.py
+      - name: Show running containers and logs
+        if: always()
+        run: |
+          docker compose ps
+          docker compose logs --no-color --tail 30

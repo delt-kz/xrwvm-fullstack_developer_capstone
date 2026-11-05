@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dealership
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: dealership}
+  template:
+    metadata:
+      labels: {app: dealership}
+    spec:
+      containers:
+        - name: web
+          image: dealership:latest
+          ports: [{containerPort: 8000}]
+          env:
+            - {name: backend_url, value: 'http://127.0.0.1:3030'}
+            - {name: sentiment_analyzer_url, value: 'http://127.0.0.1:5050'}
+        - name: mongo-api
+          image: dealership-api:latest
+          ports: [{containerPort: 3030}]
+          env:
+            - {name: MONGODB_URI, value: 'mongodb://127.0.0.1:27017/dealershipsDB'}
+        - name: sentiment
+          image: dealership-sentiment:latest
+          ports: [{containerPort: 5050}]
+        - name: database
+          image: mongo:7
+          ports: [{containerPort: 27017}]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dealership
+spec:
+  selector: {app: dealership}
+  ports:
+    - {port: 8000, targetPort: 8000}
+  type: ClusterIP
