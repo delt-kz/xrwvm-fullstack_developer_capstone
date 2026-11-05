@@ -12,4 +12,4 @@ COPY . .
 COPY --from=frontend /frontend/build /app/frontend/build
 RUN python manage.py collectstatic --noinput
 EXPOSE 8000
-CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn djangoproj.wsgi --bind 0.0.0.0:8000 --workers 2 --timeout 60"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py seed_cars && gunicorn djangoproj.wsgi --bind 0.0.0.0:8000 --workers 2 --timeout 60"]
